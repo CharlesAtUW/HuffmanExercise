@@ -1,0 +1,135 @@
+#include <cstring>
+#include <string>
+#include <sstream>
+#include "CompressedWriter.h"
+
+namespace huffman {
+
+#define CHARS_PER_CHECKSUM_ELEM 8
+
+void BuildTreeFileRepr(
+    const TreeNode &current_node,
+    int16_t &node_count,
+    std::stringstream &current_characters,
+    int16_t &special_leaf_location);
+
+std::string TreeFileRepr::ToString() const {
+    char number_buffer[MetadataSize()];
+    memcpy(number_buffer, &num_nodes, sizeof(num_nodes));
+    memcpy(
+        number_buffer + sizeof(num_nodes), &special_leaf_location, sizeof(special_leaf_location));
+
+    return std::string(number_buffer, MetadataSize()) + tree_data;
+}
+
+TreeFileRepr TreeToFileRepr(const TreeNode &root) {
+    std::stringstream characters_builder;
+    int16_t node_count = 0;
+    int16_t special_leaf_location = -1;
+    BuildTreeFileRepr(root, node_count, characters_builder, special_leaf_location);
+
+    return {
+        node_count,
+        special_leaf_location,
+        characters_builder.str()
+    };
+}
+
+void BuildTreeFileRepr(
+    const TreeNode &current_node,
+    int16_t &node_count,
+    std::stringstream &current_characters,
+    int16_t &special_leaf_location) {
+    if (current_node.IsLeaf()) {
+        unsigned char key = current_node.GetKey();
+        current_characters << key;
+        if (key == PARENT_CHAR) {
+            special_leaf_location = node_count;
+        }
+    } else {
+        BuildTreeFileRepr(
+            *current_node.GetLeft(), node_count, current_characters, special_leaf_location);
+        BuildTreeFileRepr(
+            *current_node.GetRight(), node_count, current_characters, special_leaf_location);
+
+        current_characters << PARENT_CHAR;
+    }
+
+    node_count++;
+}
+
+std::string CompressedFileRepr::ToString() const {
+    char number_buffer[MetadataSize()];
+    memcpy(number_buffer, &num_bits, sizeof(num_bits));
+
+    return std::string(number_buffer, MetadataSize()) + compressed_bits;
+}
+
+CompressedFileRepr CompressFileBytes(
+    const std::unordered_map<unsigned char, std::unique_ptr<Bits>> &char_to_bits,
+    const std::string &file_bytes) {
+
+    std::stringstream compressed_chars_builder;
+    unsigned char next_bits = '\0';
+    int bit_offset = 0;
+    for (const unsigned char b : file_bytes) {
+        char_to_bits.at(b)->WriteBitsTo(compressed_chars_builder, next_bits, bit_offset);
+    }
+    if (bit_offset != 0) {
+        compressed_chars_builder << next_bits;
+    }
+
+    std::string compressed_chars = compressed_chars_builder.str();
+
+    uint64_t total_num_bits = compressed_chars.size() * BITS_PER_ELEM;
+    if (bit_offset != 0) {
+        total_num_bits += bit_offset - BITS_PER_ELEM;
+    }
+
+    return {
+        total_num_bits,
+        compressed_chars
+    };
+}
+
+std::string FileHeader::ToString() const {
+    char number_buffer[MetadataSize()];
+    memcpy(number_buffer, &magic_number, sizeof(magic_number));
+    memcpy(number_buffer + sizeof(magic_number), &checksum, sizeof(checksum));
+    memcpy(number_buffer + sizeof(magic_number) + sizeof(checksum),
+        &content_length, sizeof(content_length));
+    return std::string(number_buffer, MetadataSize());
+}
+
+uint32_t ComputeChecksum(const std::string &data) {
+    uint32_t aggregate_hash_number = 0;
+    uint32_t current_hash_number = 1;
+    for (size_t i = 0; i < data.length(); i++) {
+        const unsigned char c = data.at(i);
+        current_hash_number = 31 * current_hash_number + c;
+        if ((i + 1) % CHARS_PER_CHECKSUM_ELEM == 0) {
+            aggregate_hash_number ^= current_hash_number;
+            current_hash_number = 1;
+        }
+    }
+    aggregate_hash_number ^= current_hash_number;
+    return aggregate_hash_number;
+}
+
+std::string BuildFile(
+    const huffman::TreeFileRepr &tree_data, huffman::CompressedFileRepr &file_data) {
+    std::string file_content = tree_data.ToString() + file_data.ToString();
+    uint32_t checksum = ComputeChecksum(file_content);
+
+    FileHeader header = {
+        MAGIC_NUMBER,
+        checksum,
+        file_content.size()
+    };
+
+    std::string compressed_file = header.ToString() + file_content;
+
+    return compressed_file;
+}
+
+}  // namespace
