@@ -12,12 +12,12 @@ namespace huffman {
 
 // This struct represents how the tree mapping bits to bytes is represented in the compressed file.
 struct TreeFileRepr {
-    int16_t num_nodes;
-    int16_t special_leaf_location;
-    std::string tree_data;
+    int16_t num_nodes;          // the number of nodes in the tree
+    int16_t special_leaf_index; // index to tell apart a parent node and a PARENT_CHAR leaf node
+    std::string tree_data;      // bytes representing the tree
 
     // Returns the number of bytes that the metadata of a TreeFileRepr takes up in ToBytes().
-    static size_t MetadataSize() { return sizeof(num_nodes) + sizeof(special_leaf_location); }
+    static size_t MetadataSize() { return sizeof(num_nodes) + sizeof(special_leaf_index); }
 
     // Returns what the bytes of this TreeFileRepr will be in the compressed file.
     std::string ToBytes() const;
@@ -29,8 +29,8 @@ TreeFileRepr TreeToFileRepr(const TreeNode &root);
 // This struct represents how the compressed data (not including the tree or header)
 // is represented in the compressed file.
 struct CompressedFileRepr {
-    uint64_t num_bits;
-    std::string compressed_bits;
+    uint64_t num_bits;              // the number of bits that the compressed file data takes up
+    std::string compressed_bits;    // the file's compressed data
 
     // Returns the number of bytes that the metadata of a CompressedFileRepr takes up in ToBytes().
     static size_t MetadataSize() { return sizeof(num_bits); }
@@ -47,9 +47,9 @@ CompressedFileRepr CompressFileBytes(
 
 // This struct represents how the file header is represented in the compressed file.
 struct FileHeader {
-    uint32_t magic_number;
-    uint32_t checksum;
-    uint64_t content_length;
+    uint32_t magic_number;      // to quickly tell if things went wrong writing/reading the file
+    uint32_t checksum;          // a calculated value to match with the file data outside FileHeader
+    uint64_t content_length;    // the length, in bytes, of the file data outside FileHeader
 
     // Returns the number of bytes that the metadata of a FileHeader takes up in ToBytes().
     static size_t MetadataSize() { return sizeof(FileHeader); }

@@ -93,17 +93,16 @@ bool PartitionTree(
         return false;
     }
 
-    int16_t special_leaf_location;
-    memcpy(
-        &special_leaf_location, contents_buffer + sizeof(num_nodes), sizeof(special_leaf_location));
-    if (special_leaf_location >= num_nodes) {
+    int16_t special_leaf_index;
+    memcpy(&special_leaf_index, contents_buffer + sizeof(num_nodes), sizeof(special_leaf_index));
+    if (special_leaf_index >= num_nodes) {
         std::cerr << "Special leaf location is not in tree region!" << std::endl;
         return false;
     }
 
     tree_repr = TreeFileRepr {
         num_nodes,
-        special_leaf_location,
+        special_leaf_index,
         std::string(tree_and_file_data, TreeFileRepr::MetadataSize(), num_nodes)
     };
 
@@ -143,7 +142,7 @@ NodePtr TreeReprToTree(const TreeFileRepr &tree_repr) {
     std::stack<NodePtr> tree_organizer;
     for (size_t i = 0; i < tree_repr.tree_data.size(); i++) {
         const unsigned char key = tree_repr.tree_data.at(i);
-        if (key == PARENT_CHAR && (int16_t) i != tree_repr.special_leaf_location) {
+        if (key == PARENT_CHAR && (int16_t) i != tree_repr.special_leaf_index) {
             NodePtr right = std::move(tree_organizer.top());
             tree_organizer.pop();
             NodePtr left = std::move(tree_organizer.top());

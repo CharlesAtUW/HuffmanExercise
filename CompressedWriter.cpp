@@ -7,17 +7,13 @@ namespace huffman {
 
 #define CHARS_PER_CHECKSUM_ELEM 8
 
-void BuildTreeFileRepr(
-    const TreeNode &current_node,
-    int16_t &node_count,
-    std::stringstream &current_characters,
-    int16_t &special_leaf_location);
+void BuildTreeFileRepr(const TreeNode &current_node, int16_t &node_count,
+    std::stringstream &current_characters, int16_t &special_leaf_index);
 
 std::string TreeFileRepr::ToBytes() const {
     char number_buffer[TreeFileRepr::MetadataSize()];
     memcpy(number_buffer, &num_nodes, sizeof(num_nodes));
-    memcpy(
-        number_buffer + sizeof(num_nodes), &special_leaf_location, sizeof(special_leaf_location));
+    memcpy(number_buffer + sizeof(num_nodes), &special_leaf_index, sizeof(special_leaf_index));
 
     return std::string(number_buffer, TreeFileRepr::MetadataSize()) + tree_data;
 }
@@ -25,32 +21,29 @@ std::string TreeFileRepr::ToBytes() const {
 TreeFileRepr TreeToFileRepr(const TreeNode &root) {
     std::stringstream characters_builder;
     int16_t node_count = 0;
-    int16_t special_leaf_location = -1;
-    BuildTreeFileRepr(root, node_count, characters_builder, special_leaf_location);
+    int16_t special_leaf_index = -1;
+    BuildTreeFileRepr(root, node_count, characters_builder, special_leaf_index);
 
     return {
         node_count,
-        special_leaf_location,
+        special_leaf_index,
         characters_builder.str()
     };
 }
 
-void BuildTreeFileRepr(
-    const TreeNode &current_node,
-    int16_t &node_count,
-    std::stringstream &current_characters,
-    int16_t &special_leaf_location) {
+void BuildTreeFileRepr(const TreeNode &current_node, int16_t &node_count,
+    std::stringstream &current_characters, int16_t &special_leaf_index) {
     if (current_node.IsLeaf()) {
         unsigned char key = current_node.GetKey();
         current_characters << key;
         if (key == PARENT_CHAR) {
-            special_leaf_location = node_count;
+            special_leaf_index = node_count;
         }
     } else {
-        BuildTreeFileRepr(
-            *current_node.GetLeft(), node_count, current_characters, special_leaf_location);
-        BuildTreeFileRepr(
-            *current_node.GetRight(), node_count, current_characters, special_leaf_location);
+        BuildTreeFileRepr(*current_node.GetLeft(), node_count, current_characters,
+            special_leaf_index);
+        BuildTreeFileRepr(*current_node.GetRight(), node_count, current_characters,
+            special_leaf_index);
 
         current_characters << PARENT_CHAR;
     }

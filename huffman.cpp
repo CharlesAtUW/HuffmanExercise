@@ -138,7 +138,7 @@ void print_compressed_data_info(
     const huffman::CompressedFileRepr &file_data,
     const std::string &compressed_file) {
     std::cout << "Num tree nodes: " << tree_data.num_nodes << std::endl
-        << "Special leaf location: " << tree_data.special_leaf_location << std::endl
+        << "Special leaf location: " << tree_data.special_leaf_index << std::endl
         << "Tree data size (bytes): " << tree_data.tree_data.size() << std::endl
         << "All TreeFileRepr size (bytes): " << tree_data.ToBytes().size() << std::endl
         << "Number of bits in compressed content: " << file_data.num_bits << std::endl
