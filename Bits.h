@@ -30,8 +30,7 @@ class Bits {
     // Returns a text string of "0" and "1" characters that corresponds to the bits of this Bits.
     std::string ToString() const;
 
-    // Writes this Bits' bits into the given string buffer.
-    void WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int &bit_offset) const;
+    friend class BitWriter;
 
  private:
     unsigned char bits_[BIT_LIMIT / BITS_PER_ELEM] = { 0 };
@@ -41,6 +40,26 @@ class Bits {
 
 // Appends the given Bits' ToString representation to the given ostream.
 std::ostream &operator<<(std::ostream &lhs, const Bits &rhs);
+
+// This class represents a buffer for bits to be appended to.
+class BitWriter {
+ public:
+   // Returns the total number of bits that have been written to this BitWriter.
+   uint64_t GetTotalNumBits() const { return total_num_bits_; }
+
+   // Appends the given Bits' bits to this BitWriter.
+   void AppendBits(const Bits &bits);
+   // Returns a string with all the bits (as bits in the string data) appended onto this BitWriter.
+   // There will be unused bits in the last byte of the string if the number of bits appended
+   // isn't evenly divisible by BITS_PER_LENGTH.
+   std::string ToBytes() const;
+
+ private:
+   uint64_t total_num_bits_ = 0;
+   std::stringstream buffer;
+   unsigned char next_bits_ = 0;
+   int bit_offset_ = 0;
+};
 
 }  // namespace huffman
 

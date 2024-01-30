@@ -69,26 +69,14 @@ CompressedFileRepr CompressFileBytes(
     const std::unordered_map<unsigned char, std::unique_ptr<Bits>> &char_to_bits,
     const std::string &file_bytes) {
 
-    std::stringstream compressed_chars_builder;
-    unsigned char next_bits = '\0';
-    int bit_offset = 0;
+    huffman::BitWriter compressed_builder;
     for (const unsigned char b : file_bytes) {
-        char_to_bits.at(b)->WriteBitsTo(compressed_chars_builder, next_bits, bit_offset);
-    }
-    if (bit_offset != 0) {
-        compressed_chars_builder << next_bits;
-    }
-
-    std::string compressed_chars = compressed_chars_builder.str();
-
-    uint64_t total_num_bits = compressed_chars.size() * BITS_PER_ELEM;
-    if (bit_offset != 0) {
-        total_num_bits += bit_offset - BITS_PER_ELEM;
+        compressed_builder.AppendBits(*char_to_bits.at(b));
     }
 
     return {
-        total_num_bits,
-        compressed_chars
+        compressed_builder.GetTotalNumBits(),
+        compressed_builder.ToBytes()
     };
 }
 

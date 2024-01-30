@@ -41,29 +41,35 @@ std::string Bits::ToString() const {
     return bits_str.str();
 }
 
-void Bits::WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int &bit_offset) const {
-    if (bit_offset >= BITS_PER_ELEM) {
-        throw std::invalid_argument("bit_offset must be between [0, BITS_PER_ELEM)");
-    }
-
-    int num_final_iteration_bits = GetNumBits() % BITS_PER_ELEM;
+void BitWriter::AppendBits(const Bits &bits) {
+    int num_final_iteration_bits = bits.GetNumBits() % BITS_PER_ELEM;
     if (num_final_iteration_bits == 0) {
         num_final_iteration_bits = BITS_PER_ELEM;
     }
-    for (int i = 0; i < ByteLength(); i++) {
-        next_bits |= bits_[i] << bit_offset;
+    for (int i = 0; i < bits.ByteLength(); i++) {
+        next_bits_ |= bits.bits_[i] << bit_offset_;
 
         bool leftover_bits_not_full_byte
-            = i == ByteLength() - 1 && num_final_iteration_bits + bit_offset < BITS_PER_ELEM;
+            = i == bits.ByteLength() - 1 && num_final_iteration_bits + bit_offset_ < BITS_PER_ELEM;
         if (leftover_bits_not_full_byte) {
             break;
         }
 
-        buffer << next_bits;
-        next_bits = bits_[i] >> (BITS_PER_ELEM - bit_offset);
+        buffer << next_bits_;
+        next_bits_ = bits.bits_[i] >> (BITS_PER_ELEM - bit_offset_);
     }
-    bit_offset += num_final_iteration_bits;
-    bit_offset %= BITS_PER_ELEM;
+    bit_offset_ += num_final_iteration_bits;
+    bit_offset_ %= BITS_PER_ELEM;
+
+    total_num_bits_ += bits.GetNumBits();
+}
+
+std::string BitWriter::ToBytes() const {
+    std::string bytes = buffer.str();
+    if (bit_offset_ != 0) {
+        bytes.push_back(next_bits_);
+    }
+    return bytes;
 }
 
 std::ostream &operator<<(std::ostream &lhs, const Bits &rhs) {
