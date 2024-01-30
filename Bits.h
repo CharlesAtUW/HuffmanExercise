@@ -3,10 +3,9 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <cstdint>
-#include <cstdlib>
-#include <memory>
 
 namespace huffman {
 

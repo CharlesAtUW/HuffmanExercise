@@ -2,6 +2,7 @@
 #define _TREENODE_H_
 
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include "Bits.h"
 

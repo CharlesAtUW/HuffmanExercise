@@ -1,7 +1,7 @@
 #ifndef _COMPRESSEDWRITER_H_
 #define _COMPRESSEDWRITER_H_
 
-#include <cstddef>
+#include <cstdint>
 #include <string>
 #include "TreeNode.h"
 
