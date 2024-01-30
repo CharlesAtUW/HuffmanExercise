@@ -56,6 +56,7 @@ NodePtr CreateTree(const std::unordered_map<unsigned char, int>& byte_to_frequen
     }
 
     while (sorter.size() != 1) {
+        // Have to use const_cast since we can't move (not copy) an element out of a priority_queue:
         // https://stackoverflow.com/questions/20149471/move-out-element-of-std-priority-queue-in-c11
         NodePtr lowest = std::move(const_cast<NodePtr&>(sorter.top()));
         sorter.pop();
@@ -72,4 +73,4 @@ NodePtr CreateTree(const std::unordered_map<unsigned char, int>& byte_to_frequen
     return root;
 }
 
-}  // namespace
+}  // namespace huffman

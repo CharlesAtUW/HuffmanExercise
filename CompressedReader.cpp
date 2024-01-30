@@ -6,7 +6,7 @@
 #include "CompressedWriter.h"
 
 namespace huffman {
-    
+
 typedef std::unique_ptr<huffman::TreeNode> NodePtr;
 
 bool PartitionHeader(
@@ -20,9 +20,8 @@ bool PartitionTree(
 bool ProcessFileReprData(const std::string &file_repr_data, CompressedFileRepr &file_repr);
 
 size_t MinContentSize() {
-    return FileHeader().MetadataSize()
-        + TreeFileRepr().MetadataSize()
-        + CompressedFileRepr().MetadataSize();
+    return FileHeader::MetadataSize() + TreeFileRepr::MetadataSize()
+        + CompressedFileRepr::MetadataSize();
 }
 
 bool PartitionFileContents(
@@ -59,14 +58,12 @@ bool PartitionHeader(
     memcpy(
         &header.checksum,
         contents_buffer + sizeof(header.magic_number),
-        sizeof(header.checksum)
-    );
+        sizeof(header.checksum));
     memcpy(
         &header.content_length,
         contents_buffer + sizeof(header.magic_number) + sizeof(header.checksum),
-        sizeof(header.content_length)
-    );
-    if (file_contents.size() - header.MetadataSize() < header.content_length) {
+        sizeof(header.content_length));
+    if (file_contents.size() - FileHeader::MetadataSize() < header.content_length) {
         std::cerr << "The file's content length field doesn't match actual length!" << std::endl;
         return false;
     }
@@ -87,7 +84,7 @@ bool PartitionTree(
     std::string &partitioned_file_data) {
     const char *contents_buffer = tree_and_file_data.data();
 
-    int remaining_size = tree_and_file_data.size() - tree_repr.MetadataSize();
+    int remaining_size = tree_and_file_data.size() - TreeFileRepr::MetadataSize();
 
     int16_t num_nodes;
     memcpy(&num_nodes, contents_buffer, sizeof(num_nodes));
@@ -107,12 +104,13 @@ bool PartitionTree(
     tree_repr = TreeFileRepr {
         num_nodes,
         special_leaf_location,
-        std::string(tree_and_file_data, tree_repr.MetadataSize(), num_nodes)
+        std::string(tree_and_file_data, TreeFileRepr::MetadataSize(), num_nodes)
     };
-    
-    partitioned_file_data = std::string(tree_and_file_data, tree_repr.MetadataSize() + num_nodes);
 
-    if (partitioned_file_data.size() < CompressedFileRepr().MetadataSize()) {
+    partitioned_file_data
+        = std::string(tree_and_file_data, TreeFileRepr::MetadataSize() + num_nodes);
+
+    if (partitioned_file_data.size() < CompressedFileRepr::MetadataSize()) {
         std::cerr << "Remaining file not big enough for CompressedFileRepr region!" << std::endl;
         return false;
     }
@@ -123,11 +121,11 @@ bool PartitionTree(
 
 bool ProcessFileReprData(const std::string &file_repr_data, CompressedFileRepr &file_repr) {
     const char *contents_buffer = file_repr_data.data();
-    uint64_t remaining_size = file_repr_data.size() - file_repr.MetadataSize();
+    uint64_t remaining_size = file_repr_data.size() - CompressedFileRepr::MetadataSize();
 
     uint64_t num_bits;
     memcpy(&num_bits, contents_buffer, sizeof(num_bits));
-    uint64_t num_bytes = num_bits / BITS_PER_ELEM + (int) (num_bits % BITS_PER_ELEM != 0);
+    uint64_t num_bytes = num_bits / BITS_PER_ELEM + static_cast<int>(num_bits % BITS_PER_ELEM != 0);
     if (num_bytes > remaining_size) {
         std::cerr << "Number of bits exceeds remaining file size!" << std::endl;
         return false;
@@ -135,7 +133,7 @@ bool ProcessFileReprData(const std::string &file_repr_data, CompressedFileRepr &
 
     file_repr = CompressedFileRepr {
         num_bits,
-        std::string(file_repr_data, file_repr.MetadataSize(), num_bytes)
+        std::string(file_repr_data, CompressedFileRepr::MetadataSize(), num_bytes)
     };
 
     return true;
@@ -165,16 +163,16 @@ std::string DecompressFile(const huffman::TreeNode &root, const CompressedFileRe
     std::stringstream decompressed_output;
     huffman::TreeNode const *current_node = &root;
 
-    std::string::const_iterator char_cycler = file_data.compressed_bits.begin();
-    unsigned char current_char = *char_cycler;
+    std::string::const_iterator byte_iterator = file_data.compressed_bits.begin();
+    unsigned char current_byte = *byte_iterator;
     for (uint64_t i = 0; i < file_data.num_bits; i++) {
         int bit_offset = i % BITS_PER_ELEM;
         if (i != 0 && bit_offset == 0) {
-            char_cycler++;
-            current_char = *char_cycler;
+            byte_iterator++;
+            current_byte = *byte_iterator;
         }
 
-        bool bit_is_one = (current_char >> bit_offset) & 0x1;
+        bool bit_is_one = (current_byte >> bit_offset) & 0x1;
 
         current_node = (bit_is_one ? current_node->GetRight() : current_node->GetLeft()).get();
         if (current_node->IsLeaf()) {
@@ -185,5 +183,5 @@ std::string DecompressFile(const huffman::TreeNode &root, const CompressedFileRe
 
     return decompressed_output.str();
 }
-    
-}  // namespace
+
+}  // namespace huffman

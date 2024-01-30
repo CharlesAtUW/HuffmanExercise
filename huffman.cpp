@@ -140,10 +140,10 @@ void print_compressed_data_info(
     std::cout << "Num tree nodes: " << tree_data.num_nodes << std::endl
         << "Special leaf location: " << tree_data.special_leaf_location << std::endl
         << "Tree data size (bytes): " << tree_data.tree_data.size() << std::endl
-        << "All TreeFileRepr size (bytes): " << tree_data.ToString().size() << std::endl
+        << "All TreeFileRepr size (bytes): " << tree_data.ToBytes().size() << std::endl
         << "Number of bits in compressed content: " << file_data.num_bits << std::endl
         << "Compressed content size (bytes): " << file_data.compressed_bits.size() << std::endl
-        << "All CompressedFileRepr size (bytes): " << file_data.ToString().size() << std::endl
+        << "All CompressedFileRepr size (bytes): " << file_data.ToBytes().size() << std::endl
         << "Total compressed file size: " << compressed_file.size() << std::endl;
 }
 
@@ -159,7 +159,7 @@ std::string compress_file_content(const std::string &file_bytes, const bool verb
     huffman::TreeFileRepr tree_data = TreeToFileRepr(*root);
     huffman::CompressedFileRepr file_data = CompressFileBytes(char_to_bits, file_bytes);
     std::string compressed_file = BuildFile(tree_data, file_data);
-    
+
     if (verbose) {
         std::cout << "File compression info:" << std::endl;
         print_character_tree(*root);

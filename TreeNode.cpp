@@ -105,4 +105,4 @@ void BuildTreeCharToBits(
     }
 }
 
-}  // namespace
+}  // namespace huffman

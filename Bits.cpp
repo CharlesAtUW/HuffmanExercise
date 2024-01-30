@@ -27,7 +27,7 @@ Bits::Bits(const unsigned char represents, const std::vector<bool> &bits)
     }
 }
 
-int Bits::Length() const {
+int Bits::ByteLength() const {
     int length = GetNumBits() / BITS_PER_LENGTH;
     return length + (GetNumBits() % BITS_PER_LENGTH != 0 ? 1 : 0);
 }
@@ -50,11 +50,11 @@ void Bits::WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int 
     if (num_final_iteration_bits == 0) {
         num_final_iteration_bits = BITS_PER_ELEM;
     }
-    for (int i = 0; i < Length(); i++) {
+    for (int i = 0; i < ByteLength(); i++) {
         next_bits |= bits_[i] << bit_offset;
 
         bool leftover_bits_not_full_byte
-            = i == Length() - 1 && num_final_iteration_bits + bit_offset < BITS_PER_ELEM;
+            = i == ByteLength() - 1 && num_final_iteration_bits + bit_offset < BITS_PER_ELEM;
         if (leftover_bits_not_full_byte) {
             break;
         }
@@ -70,4 +70,4 @@ std::ostream &operator<<(std::ostream &lhs, const Bits &rhs) {
     return lhs << rhs.ToString();
 }
 
-}  // namespace
+}  // namespace huffman

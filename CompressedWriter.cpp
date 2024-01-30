@@ -13,13 +13,13 @@ void BuildTreeFileRepr(
     std::stringstream &current_characters,
     int16_t &special_leaf_location);
 
-std::string TreeFileRepr::ToString() const {
-    char number_buffer[MetadataSize()];
+std::string TreeFileRepr::ToBytes() const {
+    char number_buffer[TreeFileRepr::MetadataSize()];
     memcpy(number_buffer, &num_nodes, sizeof(num_nodes));
     memcpy(
         number_buffer + sizeof(num_nodes), &special_leaf_location, sizeof(special_leaf_location));
 
-    return std::string(number_buffer, MetadataSize()) + tree_data;
+    return std::string(number_buffer, TreeFileRepr::MetadataSize()) + tree_data;
 }
 
 TreeFileRepr TreeToFileRepr(const TreeNode &root) {
@@ -58,11 +58,11 @@ void BuildTreeFileRepr(
     node_count++;
 }
 
-std::string CompressedFileRepr::ToString() const {
-    char number_buffer[MetadataSize()];
+std::string CompressedFileRepr::ToBytes() const {
+    char number_buffer[CompressedFileRepr::MetadataSize()];
     memcpy(number_buffer, &num_bits, sizeof(num_bits));
 
-    return std::string(number_buffer, MetadataSize()) + compressed_bits;
+    return std::string(number_buffer, CompressedFileRepr::MetadataSize()) + compressed_bits;
 }
 
 CompressedFileRepr CompressFileBytes(
@@ -92,13 +92,13 @@ CompressedFileRepr CompressFileBytes(
     };
 }
 
-std::string FileHeader::ToString() const {
-    char number_buffer[MetadataSize()];
+std::string FileHeader::ToBytes() const {
+    char number_buffer[FileHeader::MetadataSize()];
     memcpy(number_buffer, &magic_number, sizeof(magic_number));
     memcpy(number_buffer + sizeof(magic_number), &checksum, sizeof(checksum));
     memcpy(number_buffer + sizeof(magic_number) + sizeof(checksum),
         &content_length, sizeof(content_length));
-    return std::string(number_buffer, MetadataSize());
+    return std::string(number_buffer, FileHeader::MetadataSize());
 }
 
 uint32_t ComputeChecksum(const std::string &data) {
@@ -118,7 +118,7 @@ uint32_t ComputeChecksum(const std::string &data) {
 
 std::string BuildFile(
     const huffman::TreeFileRepr &tree_data, huffman::CompressedFileRepr &file_data) {
-    std::string file_content = tree_data.ToString() + file_data.ToString();
+    std::string file_content = tree_data.ToBytes() + file_data.ToBytes();
     uint32_t checksum = ComputeChecksum(file_content);
 
     FileHeader header = {
@@ -127,9 +127,9 @@ std::string BuildFile(
         file_content.size()
     };
 
-    std::string compressed_file = header.ToString() + file_content;
+    std::string compressed_file = header.ToBytes() + file_content;
 
     return compressed_file;
 }
 
-}  // namespace
+}  // namespace huffman
