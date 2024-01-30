@@ -72,6 +72,9 @@ void BuildTreeContentsRepr(const TreeNode &current_node, const std::string &inde
 std::unordered_map<unsigned char, std::unique_ptr<Bits>> TreeCharToBits(const TreeNode &root) {
     std::unordered_map<unsigned char, std::unique_ptr<Bits>> char_to_bits;
     std::vector<bool> bits;
+    if (root.IsLeaf()) {
+        bits.push_back(false);
+    }
     BuildTreeCharToBits(root, bits, char_to_bits);
     return char_to_bits;
 }

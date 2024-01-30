@@ -132,6 +132,13 @@ void print_compressed_data_info(const huffman::TreeFileRepr &tree_data,
 }
 
 std::string compress_file_content(const std::string &file_bytes, const bool verbose) {
+    if (file_bytes.empty()) {
+        if (verbose) {
+            std::cout << "Compressing an empty file!";
+        }
+        return "";
+    }
+
     // creating compressed representations
     std::unordered_map<unsigned char, int> byte_to_frequency
         = huffman::GetByteFrequencies(file_bytes);
@@ -155,12 +162,20 @@ std::string compress_file_content(const std::string &file_bytes, const bool verb
 }
 
 std::string decompress_file_content(const std::string &file_bytes, const bool verbose) {
+    if (file_bytes.empty()) {
+        if (verbose) {
+            std::cout << "Decompressing an empty file!";
+        }
+        return "";
+    }
+
+    // separate compressed file into respective sections
     huffman::TreeFileRepr tree_data;
     huffman::CompressedFileRepr file_data;
-
     if (!PartitionFileContents(file_bytes, tree_data, file_data)) {
         exit(EXIT_FAILURE);
     }
+
     std::unique_ptr<huffman::TreeNode> root = TreeReprToTree(tree_data);
 
     if (verbose) {

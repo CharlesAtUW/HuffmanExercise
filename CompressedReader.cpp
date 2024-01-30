@@ -149,6 +149,9 @@ NodePtr TreeReprToTree(const TreeFileRepr &tree_repr) {
 }
 
 std::string DecompressFile(const huffman::TreeNode &root, const CompressedFileRepr &file_data) {
+    if (root.IsLeaf()) {
+        return std::string(file_data.num_bits, root.GetKey());
+    }
     std::stringstream decompressed_output;
     huffman::TreeNode const *current_node = &root;
 
