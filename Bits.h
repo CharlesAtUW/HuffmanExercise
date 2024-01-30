@@ -23,7 +23,8 @@ class Bits {
 
     int Length() const;
     std::string ToString() const;
-    bool WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int &bit_offset) const;
+
+    void WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int &bit_offset) const;
 
  private:
     unsigned char bits_[BIT_LIMIT / BITS_PER_ELEM] = { 0 };

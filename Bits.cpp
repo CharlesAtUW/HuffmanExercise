@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <memory>
+#include <stdexcept>
 #include "Bits.h"
 
 #include <bitset>
@@ -12,8 +13,7 @@ namespace huffman {
 Bits::Bits(const unsigned char represents, const std::vector<bool> &bits)
     : num_bits_(bits.size()), representing_(represents) {
     if (GetNumBits() > BIT_LIMIT) {
-        std::cerr << "Too many bits!" << std::endl;
-        num_bits_ = BIT_LIMIT;
+        throw std::invalid_argument("Bits cannot hold more than BIT_LIMIT bits");
     }
 
     for (int i = 0; i < GetNumBits(); i++) {
@@ -41,10 +41,9 @@ std::string Bits::ToString() const {
     return bits_str.str();
 }
 
-bool Bits::WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int &bit_offset) const {
+void Bits::WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int &bit_offset) const {
     if (bit_offset >= BITS_PER_ELEM) {
-        std::cerr << "Offset too high!" << std::endl;
-        return false;
+        throw std::invalid_argument("bit_offset must be between [0, BITS_PER_ELEM)");
     }
 
     int num_final_iteration_bits = GetNumBits() % BITS_PER_ELEM;
@@ -65,8 +64,6 @@ bool Bits::WriteBitsTo(std::stringstream &buffer, unsigned char &next_bits, int 
     }
     bit_offset += num_final_iteration_bits;
     bit_offset %= BITS_PER_ELEM;
-
-    return true;
 }
 
 std::ostream &operator<<(std::ostream &lhs, const Bits &rhs) {

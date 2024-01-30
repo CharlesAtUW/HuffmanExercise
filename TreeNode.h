@@ -23,9 +23,9 @@ class TreeNode {
     // TreeNode(TreeNode &&node);
     
     int GetWeight() const { return weight_; }
-    unsigned char GetKey() const { return key_; }
-    const std::unique_ptr<TreeNode>& GetLeft() const { return left_; }
-    const std::unique_ptr<TreeNode>& GetRight() const { return right_; }
+    unsigned char GetKey() const;
+    const std::unique_ptr<TreeNode>& GetLeft() const;
+    const std::unique_ptr<TreeNode>& GetRight() const;
     bool IsLeaf() const { return is_leaf_; }
 
  private:

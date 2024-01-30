@@ -1,6 +1,7 @@
 #include <sstream>
 #include <memory>
 #include <unordered_map>
+#include <stdexcept>
 #include "TreeNode.h"
 #include "Bits.h"
 
@@ -25,9 +26,26 @@ void BuildTreeFileRepr(
     std::stringstream &current_characters,
     int16_t &special_leaf_location);
 
-// TreeNode::TreeNode(TreeNode &&node) {
+unsigned char TreeNode::GetKey() const {
+    if (!IsLeaf()) {
+        throw std::invalid_argument("Non-leaf nodes do not have keys");
+    }
+    return key_;
+}
 
-// }
+const std::unique_ptr<TreeNode>& TreeNode::GetLeft() const {
+    if (IsLeaf()) {
+        throw std::invalid_argument("Leaf nodes do not have (left) children");
+    }
+    return left_;
+}
+
+const std::unique_ptr<TreeNode>& TreeNode::GetRight() const {
+    if (IsLeaf()) {
+        throw std::invalid_argument("Leaf nodes do not have (right) children");
+    }
+    return right_;
+}
 
 bool operator<(TreeNode const& lhs, TreeNode const& rhs) {
     return lhs.GetWeight() < rhs.GetWeight();
