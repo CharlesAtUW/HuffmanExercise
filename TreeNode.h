@@ -7,7 +7,9 @@
 
 namespace huffman {
 
-// This class represents a node in a tree used for representing the bytes in a string/file.
+// This class represents a node in a binary tree used for representing the bytes in a string/file.
+// The binary tree is used for mapping between characters and (compressed) bit sequences,
+// using the placement of leaf nodes on the tree to represent the bit sequences.
 class TreeNode {
  public:
     // Constructs a non-leaf node whose left and right children are the given nodes.

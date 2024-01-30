@@ -100,8 +100,8 @@ void usage() {
     std::cerr << "USAGE: huffman -<c|d|t> [-v] <infile> [outfile]" << std::endl
         << "    -c : compress infile, output to outfile (or stdout if not given)" << std::endl
         << "    -d : decompress infile, output to outfile (or stdout if not given)" << std::endl
-        << "    -t : compress and decompress infile to test if it matches" << std::endl
-        << "         with original file; outfile ignored" << std::endl
+        << "    -t : compress infile then decompress the compressed contents, " << std::endl
+        << "         to test if it matches with original file; outfile is ignored" << std::endl
         << "    -v : verbose; print additional (de)compression information for debug" << std::endl;
     exit(EXIT_FAILURE);
 }
