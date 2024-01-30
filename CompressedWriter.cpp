@@ -97,8 +97,8 @@ uint32_t ComputeChecksum(const std::string &data) {
     return aggregate_hash_number;
 }
 
-std::string BuildFile(
-    const huffman::TreeFileRepr &tree_data, huffman::CompressedFileRepr &file_data) {
+std::string BuildFile(const huffman::TreeFileRepr &tree_data,
+    huffman::CompressedFileRepr &file_data) {
     std::string file_content = tree_data.ToBytes() + file_data.ToBytes();
     uint32_t checksum = ComputeChecksum(file_content);
 

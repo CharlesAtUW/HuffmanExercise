@@ -7,9 +7,7 @@
 namespace huffman {
 
 // Populates tree_data and file_data based on file_contents (which represents a compressed file)
-bool PartitionFileContents(
-    const std::string file_contents,
-    TreeFileRepr &tree_data,
+bool PartitionFileContents(const std::string file_contents, TreeFileRepr &tree_data,
     CompressedFileRepr &file_data);
 
 // Constructs a tree based on the contents of tree_repr.

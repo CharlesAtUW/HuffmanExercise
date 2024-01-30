@@ -9,22 +9,14 @@ namespace huffman {
 
 #define INDENT "  "
 
-void BuildTreeContentsRepr(
-    const TreeNode &current_node,
-    const std::string &indent,
-    std::stringstream &current_contents,
-    const int depth);
+void BuildTreeContentsRepr(const TreeNode &current_node, const std::string &indent,
+    std::stringstream &current_contents, const int depth);
 
-void BuildTreeCharToBits(
-    const TreeNode &current_node,
-    std::vector<bool> &bits,
+void BuildTreeCharToBits(const TreeNode &current_node, std::vector<bool> &bits,
     std::unordered_map<unsigned char, std::unique_ptr<Bits>>&current_char_to_bits);
 
-void BuildTreeFileRepr(
-    const TreeNode &current_node,
-    int16_t &node_count,
-    std::stringstream &current_characters,
-    int16_t &special_leaf_location);
+void BuildTreeFileRepr(const TreeNode &current_node, int16_t &node_count,
+    std::stringstream &current_characters, int16_t &special_leaf_index);
 
 unsigned char TreeNode::GetKey() const {
     if (!IsLeaf()) {
@@ -61,11 +53,8 @@ std::string TreeContentsRepr(const TreeNode &root) {
     return tree_contents.str();
 }
 
-void BuildTreeContentsRepr(
-    const TreeNode &current_node,
-    const std::string &indent,
-    std::stringstream &current_contents,
-    const int depth) {
+void BuildTreeContentsRepr(const TreeNode &current_node, const std::string &indent,
+    std::stringstream &current_contents, const int depth) {
     if (current_node.IsLeaf()) {
         current_contents << indent << "Leaf(key=" << current_node.GetKey()
             << ", weight=" << current_node.GetWeight()
@@ -87,9 +76,7 @@ std::unordered_map<unsigned char, std::unique_ptr<Bits>> TreeCharToBits(const Tr
     return char_to_bits;
 }
 
-void BuildTreeCharToBits(
-    const TreeNode &current_node,
-    std::vector<bool> &bits,
+void BuildTreeCharToBits(const TreeNode &current_node, std::vector<bool> &bits,
     std::unordered_map<unsigned char, std::unique_ptr<Bits>>&current_char_to_bits) {
     if (current_node.IsLeaf()) {
         unsigned char key = current_node.GetKey();

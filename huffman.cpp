@@ -19,21 +19,15 @@
 
 #define STDOUT_FILENAME "\0"
 
-void parse_args(
-    int argc,
-    char **argv,
-    int &mode,
-    bool &verbose,
-    std::string &input_filename,
-    std::string &output_filename);
+void parse_args(int argc, char **argv, int &mode, bool &verbose,
+    std::string &input_filename, std::string &output_filename);
 void usage();
 
 void print_characters_information(
     const std::unordered_map<unsigned char, int> &byte_to_frequency,
     const std::unordered_map<unsigned char, std::unique_ptr<huffman::Bits>> &char_to_bits);
 void print_character_tree(const huffman::TreeNode &root);
-void print_compressed_data_info(
-    const huffman::TreeFileRepr &tree_data,
+void print_compressed_data_info(const huffman::TreeFileRepr &tree_data,
     const huffman::CompressedFileRepr &file_data,
     const std::string &compressed_file);
 
@@ -74,13 +68,8 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-void parse_args(
-    int argc,
-    char **argv,
-    int &mode,
-    bool &verbose,
-    std::string &input_filename,
-    std::string &output_filename) {
+void parse_args(int argc, char **argv, int &mode, bool &verbose,
+    std::string &input_filename, std::string &output_filename) {
     if (argc != 3 && argc != 4 && argc != 5) {
         usage();
     }
@@ -133,8 +122,7 @@ void print_characters_information(
     }
 }
 
-void print_compressed_data_info(
-    const huffman::TreeFileRepr &tree_data,
+void print_compressed_data_info(const huffman::TreeFileRepr &tree_data,
     const huffman::CompressedFileRepr &file_data,
     const std::string &compressed_file) {
     std::cout << "Num tree nodes: " << tree_data.num_nodes << std::endl

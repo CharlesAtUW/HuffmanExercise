@@ -9,12 +9,10 @@ namespace huffman {
 
 typedef std::unique_ptr<huffman::TreeNode> NodePtr;
 
-bool PartitionHeader(
-    const std::string &file_contents, std::string &partitioned_tree_and_file_data);
+bool PartitionHeader(const std::string &file_contents,
+    std::string &partitioned_tree_and_file_data);
 
-bool PartitionTree(
-    const std::string &tree_and_data,
-    TreeFileRepr &tree_data,
+bool PartitionTree(const std::string &tree_and_data, TreeFileRepr &tree_data,
     std::string &partitioned_file_data);
 
 bool ProcessFileReprData(const std::string &file_repr_data, CompressedFileRepr &file_repr);
@@ -24,9 +22,7 @@ size_t MinContentSize() {
         + CompressedFileRepr::MetadataSize();
 }
 
-bool PartitionFileContents(
-    const std::string file_contents,
-    TreeFileRepr &tree_repr,
+bool PartitionFileContents(const std::string file_contents, TreeFileRepr &tree_repr,
     CompressedFileRepr &file_repr) {
     std::string tree_and_file_data;
     if (!PartitionHeader(file_contents, tree_and_file_data)) {
@@ -55,12 +51,9 @@ bool PartitionHeader(
         return false;
     }
 
-    memcpy(
-        &header.checksum,
-        contents_buffer + sizeof(header.magic_number),
+    memcpy(&header.checksum, contents_buffer + sizeof(header.magic_number),
         sizeof(header.checksum));
-    memcpy(
-        &header.content_length,
+    memcpy(&header.content_length,
         contents_buffer + sizeof(header.magic_number) + sizeof(header.checksum),
         sizeof(header.content_length));
     if (file_contents.size() - FileHeader::MetadataSize() < header.content_length) {
@@ -78,9 +71,7 @@ bool PartitionHeader(
     return true;
 }
 
-bool PartitionTree(
-    const std::string &tree_and_file_data,
-    TreeFileRepr &tree_repr,
+bool PartitionTree(const std::string &tree_and_file_data, TreeFileRepr &tree_repr,
     std::string &partitioned_file_data) {
     const char *contents_buffer = tree_and_file_data.data();
 
@@ -113,7 +104,6 @@ bool PartitionTree(
         std::cerr << "Remaining file not big enough for CompressedFileRepr region!" << std::endl;
         return false;
     }
-
 
     return true;
 }
