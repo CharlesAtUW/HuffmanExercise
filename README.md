@@ -13,7 +13,7 @@ USAGE: huffman -<c|d|t> [-v] <infile> [outfile]
          to test if it matches with original file; outfile is ignored
     -v : verbose; print additional (de)compression information for debug
 ```
-- It is mandatory to pass in one of `-c` (to compress), `-d` (to decompress), or `-t` (to test), as well as an input filename (`infile`) into `huffman`. Verbose mode (`-v`) and the output file (`outfile`) are optional.
+- It is mandatory to pass in one of `-c` (to compress), `-d` (to decompress), or `-t` (to test) into `huffman`. It is also mandatory to pass in an input filename (`infile`). Verbose mode (`-v`) and the output file (`outfile`) are optional.
 
 ## Environment
 - C++ 17 was the version used for the code for this exercise.
@@ -29,3 +29,31 @@ USAGE: huffman -<c|d|t> [-v] <infile> [outfile]
 - `TreeNode.h`: classes/methods concerning the mapping of individual characters to compressed bit sequences
 - `UncompressedReader.h`: functions that concern the reading of uncompressed file data, and the outputting into various representations of that data
 - `huffman.cpp`: `main` is located here; does the execution of compressing and decompressing
+
+## Compressed file layout
+Here is the layout of compressed files produced by this repository. Documentation on each field can be found in `CompressedWriter.h` under their respective structs. Note that any `std::string` fields in the structs are represented as the raw bytes of the string data in the actual file.
+```
+(start of file; start of FileHeader region)
++-----------------------------------------------+
+|   magic_number (4 bytes)                      |
++-----------------------------------------------+
+|   checksum (4 bytes)                          |
++-----------------------------------------------+
+|   content_length (8 bytes)                    |
++-----------------------------------------------+
+(start of TreeFileRepr region)
++-----------------------------------------------+ 
+|   num_nodes (2 bytes)                         |
++-----------------------------------------------+
+|   special_leaf_index (2 bytes)                |
++-----------------------------------------------+
+|   tree_data (num_nodes bytes)                 |
++-----------------------------------------------+
+(start of CompressedFileRepr region)
++-----------------------------------------------+
+|   num_bits (8 bytes)                          |
++-----------------------------------------------+
+|   compressed_bits (ceil(num_bits / 8.) bytes) |
++-----------------------------------------------+
+```
+The only exception to this is the compression of an empty file. A compressed empty file is instead another empty file.
