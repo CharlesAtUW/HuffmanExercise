@@ -83,8 +83,8 @@ void parse_args(int argc, char **argv, int &mode, bool &verbose,
 
     std::string verbose_str(argv[2]);
     int input_index = 2;
-    if (!verbose_str.compare("-v") || !verbose_str.compare("-V")) {
-        verbose = true;
+    verbose = !verbose_str.compare("-v") || !verbose_str.compare("-V");
+    if (verbose) {
         input_index++;
     }
 
