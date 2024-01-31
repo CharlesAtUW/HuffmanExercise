@@ -1,6 +1,8 @@
 # Huffman Exercise
 This repository contains a working Huffman file compressor and decompressor, following the [Huffman exercise](https://www.smu.edu/-/media/Site/guildhallOLD/Documents/Huffman_Exercise.pdf).
 
+This file compressor works by mapping more common bytes in the file to shorter bit sequences (i.e., less than 8 bits). (This means that less common bytes might be mapped to a bit sequence greater than 8 bits, but since they're less common, we overall get a smaller compressed file size.)
+
 ## How to use
 To use this repository,
 - First, compile and link the files by using the Makefile (that is, run the command `make` while in the top-level directory of this repository). This will create the executable file `huffman`.
