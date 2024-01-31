@@ -134,7 +134,7 @@ void print_compressed_data_info(const huffman::TreeFileRepr &tree_data,
 std::string compress_file_content(const std::string &file_bytes, const bool verbose) {
     if (file_bytes.empty()) {
         if (verbose) {
-            std::cout << "Compressing an empty file!";
+            std::cout << "Compressing an empty file!" << std::endl;
         }
         return "";
     }
@@ -164,7 +164,7 @@ std::string compress_file_content(const std::string &file_bytes, const bool verb
 std::string decompress_file_content(const std::string &file_bytes, const bool verbose) {
     if (file_bytes.empty()) {
         if (verbose) {
-            std::cout << "Decompressing an empty file!";
+            std::cout << "Decompressing an empty file!" << std::endl;
         }
         return "";
     }
